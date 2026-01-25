@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>AI Suara Imut TTS</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #fdf2f8;
+      padding: 30px;
+    }
+    h1 { color: #d946ef; }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background: #ec4899;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover { background: #db2777; }
+    audio { margin-top: 20px; width: 100%; }
+  </style>
+</head>
+<body>
+
+<h1>🎀 AI Text-to-Speech Suara Imut</h1>
+
+<label>API Key ElevenLabs</label>
+<input type="password" id="apiKey" placeholder="Masukkan API key kamu">
+
+<label>Voice ID</label>
+<input type="text" id="voiceId" placeholder="Contoh: 21m00Tcm4TlvDq8ikWAM">
+
+<label>Teks yang mau dibacakan</label>
+<textarea id="textInput" rows="5" placeholder="Halooo~ aku AI imut!"></textarea>
+
+<button onclick="generateSpeech()">🎙️ Generate Suara</button>
+
+<audio id="audioPlayer" controls></audio>
+
+<script>
+async function generateSpeech() {
+  const apiKey = document.getElementById("apiKey").value;
+  const voiceId = document.getElementById("voiceId").value;
+  const text = document.getElementById("textInput").value;
+
+  if (!apiKey || !voiceId || !text) {
+    alert("Semua field harus diisi!");
+    return;
+  }
+
+  const url = `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`;
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "xi-api-key": apiKey,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        text: text,
+        model_id: "eleven_multilingual_v2",
+        voice_settings: {
+          stability: 0.4,
+          similarity_boost: 0.8
+        }
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error("Gagal generate suara");
+    }
+
+    const audioBlob = await response.blob();
+    const audioUrl = URL.createObjectURL(audioBlob);
+    document.getElementById("audioPlayer").src = audioUrl;
+
+  } catch (err) {
+    alert("Error: " + err.message);
+  }
+}
+</script>
+
+</body>
+</html>
